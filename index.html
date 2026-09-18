@@ -20,6 +20,16 @@
             50% { transform: rotate(280deg); }
             100% { transform: rotate(0deg); }
         }
+
+        /* Pulse Animation สำหรับไฟสถานะออนไลน์ */
+        .online-indicator {
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        }
     </style>
 </head>
 <body class="text-white select-none relative w-full h-full bg-black">
@@ -30,6 +40,19 @@
             <span id="audioIcon">🔊</span>
             <span id="audioText">เสียงบรรยากาศ: ปิด</span>
         </button>
+    </div>
+
+    <!-- Online Users Widget (แสดงจำนวนคนออนไลน์ที่มุมขวาล่าง) -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <div class="bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-200 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 shadow-2xl">
+            <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span>ออนไลน์ขณะนี้:</span>
+            <span id="onlineCount" class="font-bold text-amber-400">12</span>
+            <span>คน</span>
+        </div>
     </div>
 
     <!-- SCREEN 1: FRONT RESTAURANT (รูปหน้าร้านในโฟลเดอร์ images) -->
@@ -153,7 +176,7 @@
         </div>
 
         <!-- Bottom Chat Input Bar -->
-        <div class="relative z-10 p-3 bg-black/85 backdrop-blur-lg border-t border-amber-500/30 pl-36 md:pl-3">
+        <div class="relative z-10 p-3 bg-black/85 backdrop-blur-lg border-t border-amber-500/30">
             <form onsubmit="handleSendMessage(event)" class="max-w-2xl mx-auto flex items-center gap-2">
                 <input id="chatInput" type="text" placeholder="พิมพ์ข้อความระบายความในใจที่นี่..." class="flex-1 bg-stone-900/90 text-amber-100 border border-amber-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 placeholder-stone-500">
                 <button type="submit" class="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-amber-100 font-semibold px-5 py-3 rounded-xl text-sm transition flex items-center gap-1 shadow-lg shrink-0">
@@ -222,6 +245,17 @@
     <script>
         let currentRole = 'speaker';
         let isAudioPlaying = false;
+        let onlineCount = 12; // จำนวนเริ่มต้น
+
+        // สุ่มตัวเลขขยับขึ้นลงของคนออนไลน์เพื่อความสมจริง
+        setInterval(() => {
+            const change = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
+            onlineCount = Math.max(5, onlineCount + change);
+            const countElem = document.getElementById('onlineCount');
+            if(countElem) {
+                countElem.innerText = onlineCount;
+            }
+        }, 5000);
 
         function goToScreen(screenId) {
             document.querySelectorAll('body > div').forEach(div => {
