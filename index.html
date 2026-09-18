@@ -20,12 +20,18 @@
             50% { transform: rotate(280deg); }
             100% { transform: rotate(0deg); }
         }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(217, 119, 6, 0.4); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(217, 119, 6, 0.7); }
     </style>
 </head>
-<body class="text-white select-none relative w-full h-full bg-black">
+<body class="text-white select-none relative w-full h-full bg-black overflow-hidden">
 
     <!-- Ambient Audio Toggle -->
-    <div class="fixed bottom-4 left-4 z-50">
+    <div class="fixed bottom-4 left-4 z-40">
         <button onclick="toggleAudio()" id="audioBtn" class="bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 hover:bg-black/95 transition shadow-2xl">
             <span id="audioIcon">🔊</span>
             <span id="audioText">เสียงบรรยากาศ: ปิด</span>
@@ -33,7 +39,7 @@
     </div>
 
     <!-- Real-time Online Users Widget -->
-    <div class="fixed bottom-4 right-4 z-50">
+    <div class="fixed bottom-4 right-4 z-40">
         <div class="bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-200 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 shadow-2xl">
             <span class="relative flex h-2.5 w-2.5">
                 <span id="pingDot" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -42,6 +48,55 @@
             <span>ออนไลน์ขณะนี้:</span>
             <span id="onlineCount" class="font-bold text-amber-400">0</span>
             <span>คน</span>
+        </div>
+    </div>
+
+    <!-- CALL OVERLAY (FOR LISTENER / CHEF) -->
+    <div id="incomingCallModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 fade-in">
+        <div class="bg-stone-900 border-2 border-amber-500/60 rounded-3xl p-6 text-center max-w-sm w-full shadow-2xl relative">
+            <div class="w-20 h-20 mx-auto rounded-full bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center text-4xl animate-bounce mb-4">
+                📞
+            </div>
+            <h3 class="text-xl font-bold text-amber-200">มีสายเรียกเข้า...</h3>
+            <p class="text-stone-400 text-xs mt-1 mb-6">มีผู้ใช้ต้องการระบายความรู้สึกกับเชฟ</p>
+            <div class="flex gap-3">
+                <button onclick="acceptCall()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition shadow-lg">
+                    รับสาย 🟢
+                </button>
+                <button onclick="endCall()" class="flex-1 py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-sm transition shadow-lg">
+                    ปฏิเสธ 🔴
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVE CALL OVERLAY (FOR BOTH ROLES) -->
+    <div id="activeCallModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg p-4 fade-in">
+        <div class="bg-stone-900/90 border border-amber-500/40 rounded-3xl p-8 text-center max-w-sm w-full shadow-2xl">
+            <div class="w-24 h-24 mx-auto rounded-full bg-stone-800 border-4 border-amber-400/60 flex items-center justify-center text-5xl mb-4 relative">
+                <span class="animate-pulse">🎙️</span>
+            </div>
+            <h3 id="activeCallTitle" class="text-lg font-bold text-amber-200">กำลังสนทนาสายพักใจ</h3>
+            <p id="callTimer" class="text-amber-400 font-mono text-2xl font-bold my-3">00:00</p>
+            <p class="text-stone-400 text-xs mb-6">พื้นที่ปลอดภัยสำหรับการรับฟัง</p>
+            <button onclick="endCall()" class="w-full py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-sm transition shadow-lg">
+                วางสาย 🔴
+            </button>
+        </div>
+    </div>
+
+    <!-- APPOINTMENTS LIST MODAL (FOR LISTENER / CHEF) -->
+    <div id="appointmentsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 fade-in">
+        <div class="bg-stone-900 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full shadow-2xl flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center mb-4 border-b border-stone-800 pb-3">
+                <h3 class="text-lg font-bold text-amber-200 flex items-center gap-2">
+                    <span>📜</span> รายการใบนัดหมายล่วงหน้า
+                </h3>
+                <button onclick="toggleAppointmentsModal(false)" class="text-stone-400 hover:text-white text-sm">✕</button>
+            </div>
+            <div id="appointmentsList" class="flex-1 overflow-y-auto space-y-3 pr-1">
+                <p class="text-stone-500 text-xs text-center py-8">ไม่มีรายการนัดหมายในขณะนี้</p>
+            </div>
         </div>
     </div>
 
@@ -152,7 +207,14 @@
                     <span id="connectionStatus" class="text-[10px] text-amber-400 flex items-center gap-1">○ กำลังเชื่อมต่อกับ Firebase...</span>
                 </div>
             </div>
-            <button onclick="goToScreen('screen-2')" class="text-xs bg-stone-800/80 text-stone-300 px-3 py-1.5 rounded-lg border border-stone-700 hover:bg-stone-700 transition">ออกจากร้าน</button>
+            
+            <div class="flex items-center gap-2">
+                <button id="chefAppointmentsBtn" onclick="toggleAppointmentsModal(true)" class="hidden text-xs bg-amber-900/80 text-amber-200 px-3 py-1.5 rounded-lg border border-amber-600/40 hover:bg-amber-800 transition items-center gap-1">
+                    <span>📜 ใบนัดหมาย</span>
+                    <span id="appointmentBadge" class="bg-amber-500 text-black px-1.5 py-0.2 rounded-full font-bold text-[10px]">0</span>
+                </button>
+                <button onclick="goToScreen('screen-2')" class="text-xs bg-stone-800/80 text-stone-300 px-3 py-1.5 rounded-lg border border-stone-700 hover:bg-stone-700 transition">ออกจากร้าน</button>
+            </div>
         </div>
 
         <!-- Chat History Container -->
@@ -183,7 +245,7 @@
             <p id="phoneStatus" class="text-stone-400 text-xs mb-6">กดหมุนเพื่อโทรออกหากต้องการคนรับฟัง</p>
 
             <div class="relative w-48 h-48 mx-auto my-4 bg-stone-800 rounded-full border-4 border-amber-600/50 flex items-center justify-center shadow-2xl">
-                <div id="rotaryWheel" class="rotary-dial absolute inset-2 rounded-full border-2 border-dashed border-amber-400/40 flex items-center justify-center cursor-pointer" onclick="spinPhone()">
+                <div id="rotaryWheel" class="rotary-dial absolute inset-2 rounded-full border-2 border-dashed border-amber-400/40 flex items-center justify-center cursor-pointer" onclick="initiateCall()">
                     <span class="text-4xl">📞</span>
                 </div>
                 <div class="w-16 h-16 rounded-full bg-stone-900 border border-amber-500/30 flex items-center justify-center text-amber-300 font-bold text-xs">
@@ -191,7 +253,7 @@
                 </div>
             </div>
 
-            <button onclick="spinPhone()" class="w-full py-3 bg-amber-700 hover:bg-amber-600 text-amber-100 font-semibold rounded-xl text-sm transition mt-4 shadow-lg">
+            <button onclick="initiateCall()" class="w-full py-3 bg-amber-700 hover:bg-amber-600 text-amber-100 font-semibold rounded-xl text-sm transition mt-4 shadow-lg">
                 🌀 หมุนจานโทรศัพท์
             </button>
             <button onclick="goToScreen('screen-speaker-options')" class="mt-4 text-xs text-stone-500 hover:text-stone-300 transition">← ย้อนกลับ</button>
@@ -208,20 +270,21 @@
 
             <form onsubmit="handleMeetSubmit(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-bold text-amber-900 mb-1">สถานที่นัดหมาย:</label>
-                    <select class="w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none">
-                        <option>ร้านพักใจ สาขาเอกมัย (ห้องส่วนตัว)</option>
-                        <option>ร้านพักใจ สาขาอารีย์ (โซนสวน)</option>
-                        <option>สถานที่เงียบสงบตามตกลง</option>
+                    <label class="block font-bold text-amber-900 mb-1">ตัวเลือกสถานที่:</label>
+                    <select id="meetLocationSelect" onchange="toggleCustomLocation()" class="w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none mb-2">
+                        <option value="ร้านพักใจ สาขาเอกมัย (ห้องส่วนตัว)">ร้านพักใจ สาขาเอกมัย (ห้องส่วนตัว)</option>
+                        <option value="ร้านพักใจ สาขาอารีย์ (โซนสวน)">ร้านพักใจ สาขาอารีย์ (โซนสวน)</option>
+                        <option value="custom">-- ระบุสถานที่เอง --</option>
                     </select>
+                    <input id="meetLocationCustom" type="text" placeholder="ระบุสถานที่นัดหมายที่คุณสะดวก..." class="hidden w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none">
                 </div>
                 <div>
                     <label class="block font-bold text-amber-900 mb-1">วันที่:</label>
-                    <input type="date" required class="w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none">
+                    <input id="meetDate" type="date" required class="w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none">
                 </div>
                 <div>
                     <label class="block font-bold text-amber-900 mb-1">เวลา:</label>
-                    <input type="time" required class="w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none">
+                    <input id="meetTime" type="time" required class="w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none">
                 </div>
                 <button type="submit" class="w-full py-3 bg-amber-900 hover:bg-amber-950 text-amber-100 font-bold rounded-lg mt-4 transition shadow-md">
                     ยืนยันใบนัดหมาย 📜
@@ -234,7 +297,7 @@
     <!-- FIREBASE REALTIME BACKEND SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue, set, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBNyrkgaoVPfhU_9tUD2THJZPAR_dgF80k",
@@ -251,14 +314,20 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Global Variables
+        // Global State Variables
         window.currentRole = 'speaker';
         window.isAudioPlaying = false;
+        let callTimerInterval = null;
+        let callSeconds = 0;
 
-        // 1. Presence System (นับคนออนไลน์เรียลไทม์)
+        // Firebase References
         const connectedRef = ref(db, ".info/connected");
         const presenceRef = ref(db, "presence");
+        const messagesRef = ref(db, "messages");
+        const callsRef = ref(db, "calls");
+        const appointmentsRef = ref(db, "appointments");
 
+        // 1. Presence System
         onValue(connectedRef, (snap) => {
             if (snap.val() === true) {
                 const statusElem = document.getElementById('connectionStatus');
@@ -279,9 +348,6 @@
         });
 
         // 2. Realtime Chat System
-        const messagesRef = ref(db, "messages");
-
-        // ดึงและแสดงผลข้อความจาก Firebase
         onValue(messagesRef, (snapshot) => {
             const chatHistory = document.getElementById('chatHistory');
             chatHistory.innerHTML = `
@@ -311,7 +377,6 @@
             }
         });
 
-        // ส่งข้อความตรงเข้า Firebase
         document.getElementById('chatForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const input = document.getElementById('chatInput');
@@ -327,6 +392,159 @@
             input.value = '';
         });
 
+        // 3. Realtime Phone / Call System
+        onValue(callsRef, (snap) => {
+            const callData = snap.val();
+            const incomingModal = document.getElementById('incomingCallModal');
+            const activeModal = document.getElementById('activeCallModal');
+
+            if (!callData) {
+                incomingModal.classList.add('hidden');
+                activeModal.classList.add('hidden');
+                stopCallTimer();
+                return;
+            }
+
+            if (callData.status === 'calling') {
+                if (window.currentRole === 'listener') {
+                    incomingModal.classList.remove('hidden');
+                }
+                activeModal.classList.add('hidden');
+            } else if (callData.status === 'active') {
+                incomingModal.classList.add('hidden');
+                activeModal.classList.remove('hidden');
+                startCallTimer();
+            }
+        });
+
+        window.initiateCall = function() {
+            const wheel = document.getElementById('rotaryWheel');
+            const status = document.getElementById('phoneStatus');
+            wheel.classList.add('spinning');
+            status.innerText = "กำลังหมุนสัญญาณ...";
+            
+            setTimeout(() => {
+                wheel.classList.remove('spinning');
+                status.innerText = "กำลังต่อสายไปยังเชฟผู้รับฟัง... 📞";
+                set(callsRef, {
+                    status: 'calling',
+                    startedAt: Date.now()
+                });
+            }, 1200);
+        };
+
+        window.acceptCall = function() {
+            set(callsRef, {
+                status: 'active',
+                acceptedAt: Date.now()
+            });
+        };
+
+        window.endCall = function() {
+            remove(callsRef);
+            document.getElementById('phoneStatus').innerText = "กดหมุนเพื่อโทรออกหากต้องการคนรับฟัง";
+        };
+
+        function startCallTimer() {
+            if (callTimerInterval) return;
+            callSeconds = 0;
+            const timerElem = document.getElementById('callTimer');
+            callTimerInterval = setInterval(() => {
+                callSeconds++;
+                const mins = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+                const secs = String(callSeconds % 60).padStart(2, '0');
+                timerElem.innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopCallTimer() {
+            if (callTimerInterval) {
+                clearInterval(callTimerInterval);
+                callTimerInterval = null;
+            }
+            callSeconds = 0;
+        }
+
+        // 4. Realtime Appointments System
+        onValue(appointmentsRef, (snap) => {
+            const listContainer = document.getElementById('appointmentsList');
+            const badge = document.getElementById('appointmentBadge');
+            
+            if (!snap.exists()) {
+                listContainer.innerHTML = `<p class="text-stone-500 text-xs text-center py-8">ไม่มีรายการนัดหมายในขณะนี้</p>`;
+                badge.innerText = '0';
+                return;
+            }
+
+            const items = snap.val();
+            const keys = Object.keys(items);
+            badge.innerText = keys.length;
+            listContainer.innerHTML = '';
+
+            keys.forEach((key) => {
+                const appt = items[key];
+                const card = document.createElement('div');
+                card.className = "bg-stone-800 border border-amber-500/30 rounded-xl p-3.5 text-xs text-amber-100 flex flex-col gap-1.5 shadow-md";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="font-bold text-amber-300">📍 ${appt.location}</span>
+                        <span class="text-[10px] text-stone-400">${new Date(appt.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <div class="text-stone-300 flex items-center gap-3">
+                        <span>📅 ${appt.date}</span>
+                        <span>⏰ ${appt.time} น.</span>
+                    </div>
+                    <button onclick="confirmAppointment('${key}')" class="mt-2 w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-[11px] transition shadow">
+                        ยืนยันใบนัดหมาย ✓
+                    </button>
+                `;
+                listContainer.appendChild(card);
+            });
+        });
+
+        window.handleMeetSubmit = function(e) {
+            e.preventDefault();
+            const selectVal = document.getElementById('meetLocationSelect').value;
+            const customVal = document.getElementById('meetLocationCustom').value.trim();
+            const location = (selectVal === 'custom' && customVal) ? customVal : selectVal;
+            const date = document.getElementById('meetDate').value;
+            const time = document.getElementById('meetTime').value;
+
+            push(appointmentsRef, {
+                location: location,
+                date: date,
+                time: time,
+                createdAt: Date.now()
+            });
+
+            alert("บันทึกใบนัดหมายเรียบร้อยแล้ว! เชฟจะเตรียมโต๊ะโอมากาเสะรอคุณตามเวลาที่นัดหมายครับ");
+            window.goToScreen('screen-2');
+        };
+
+        window.confirmAppointment = function(key) {
+            const apptRef = ref(db, `appointments/${key}`);
+            remove(apptRef);
+            alert("ยืนยันใบนัดหมายสำเร็จ!");
+        };
+
+        window.toggleCustomLocation = function() {
+            const select = document.getElementById('meetLocationSelect');
+            const customInput = document.getElementById('meetLocationCustom');
+            if (select.value === 'custom') {
+                customInput.classList.remove('hidden');
+                customInput.required = true;
+            } else {
+                customInput.classList.add('hidden');
+                customInput.required = false;
+            }
+        };
+
+        window.toggleAppointmentsModal = function(show) {
+            const modal = document.getElementById('appointmentsModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        };
+
         // Navigation & Interactive Functions
         window.goToScreen = function(screenId) {
             document.querySelectorAll('body > div').forEach(div => {
@@ -340,6 +558,7 @@
             window.currentRole = 'speaker';
             document.getElementById('chatPartnerName').innerText = 'เชฟประจำร้าน (คนฟัง)';
             document.getElementById('chatPartnerAvatar').src = 'images/HeadChee.jpg';
+            document.getElementById('chefAppointmentsBtn').classList.add('hidden');
             window.goToScreen('screen-chat');
         };
 
@@ -347,25 +566,9 @@
             window.currentRole = 'listener';
             document.getElementById('chatPartnerName').innerText = 'คุณลูกค้ารายแรก (คนพูด)';
             document.getElementById('chatPartnerAvatar').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop';
+            document.getElementById('chefAppointmentsBtn').classList.remove('hidden');
+            document.getElementById('chefAppointmentsBtn').classList.add('flex');
             window.goToScreen('screen-chat');
-        };
-
-        window.spinPhone = function() {
-            const wheel = document.getElementById('rotaryWheel');
-            const status = document.getElementById('phoneStatus');
-            wheel.classList.add('spinning');
-            status.innerText = "กำลังหมุนสัญญาณ...";
-            
-            setTimeout(() => {
-                wheel.classList.remove('spinning');
-                status.innerText = "กำลังเชื่อมต่อสายไปยังเชฟผู้รับฟัง... 📞";
-            }, 1200);
-        };
-
-        window.handleMeetSubmit = function(e) {
-            e.preventDefault();
-            alert("บันทึกใบนัดหมายเรียบร้อยแล้ว! เชฟจะเตรียมโต๊ะโอมากาเสะรอคุณตามเวลาที่นัดหมายครับ");
-            window.goToScreen('screen-2');
         };
 
         window.toggleAudio = function() {
