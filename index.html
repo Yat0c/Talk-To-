@@ -20,21 +20,11 @@
             50% { transform: rotate(280deg); }
             100% { transform: rotate(0deg); }
         }
-
-        /* Pulse Animation สำหรับไฟสถานะออนไลน์ */
-        .online-indicator {
-            animation: pulse-green 2s infinite;
-        }
-        @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
-        }
     </style>
 </head>
 <body class="text-white select-none relative w-full h-full bg-black">
 
-    <!-- Ambient Audio Toggle (ปุ่มเปิดปิดเสียงบรรยากาศอยู่มุมซ้ายล่าง) -->
+    <!-- Ambient Audio Toggle -->
     <div class="fixed bottom-4 left-4 z-50">
         <button onclick="toggleAudio()" id="audioBtn" class="bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 hover:bg-black/95 transition shadow-2xl">
             <span id="audioIcon">🔊</span>
@@ -42,7 +32,7 @@
         </button>
     </div>
 
-    <!-- Online Users Widget (แสดงจำนวนคนออนไลน์ที่มุมขวาล่าง) -->
+    <!-- Real-time Online Users Widget -->
     <div class="fixed bottom-4 right-4 z-50">
         <div class="bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-200 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 shadow-2xl">
             <span class="relative flex h-2.5 w-2.5">
@@ -50,7 +40,7 @@
                 <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
             <span>ออนไลน์ขณะนี้:</span>
-            <span id="onlineCount" class="font-bold text-amber-400">12</span>
+            <span id="onlineCount" class="font-bold text-amber-400">0</span>
             <span>คน</span>
         </div>
     </div>
@@ -78,7 +68,6 @@
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-950/30 via-stone-950 to-black"></div>
 
         <div class="relative z-10 max-w-lg w-full bg-stone-900/90 border border-amber-600/30 rounded-3xl p-8 backdrop-blur-xl text-center shadow-2xl">
-            <!-- Circular Chef Avatar -->
             <div class="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-amber-500/60 shadow-2xl mb-4 relative bg-stone-800">
                 <img src="images/HeadChee.jpg" onerror="this.src='https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=800&auto=format&fit=crop'" alt="Head Chef" class="w-full h-full object-cover">
                 <div class="absolute bottom-0 inset-x-0 bg-black/80 py-1 text-[10px] text-amber-300 font-medium">หัวหน้าเชฟประจำร้าน</div>
@@ -91,13 +80,13 @@
                 <button onclick="goToScreen('screen-speaker-options')" class="p-5 rounded-2xl bg-gradient-to-br from-amber-900/40 to-stone-800 border border-amber-500/30 hover:border-amber-400 hover:scale-102 transition flex flex-col items-center text-center group">
                     <span class="text-3xl mb-2 group-hover:scale-110 transition">🗣️</span>
                     <span class="font-bold text-amber-200">คนพูด</span>
-                    <span class="text-[11px] text-stone-400 mt-1">ต้องการระบายความรู้สึก ปลดปล่อยความเครียด</span>
+                    <span class="text-[11px] text-stone-400 mt-1">ต้องการระบายความรู้สึก</span>
                 </button>
 
                 <button onclick="startListenerRole()" class="p-5 rounded-2xl bg-gradient-to-br from-stone-800 to-stone-900 border border-amber-500/20 hover:border-amber-400 hover:scale-102 transition flex flex-col items-center text-center group">
                     <span class="text-3xl mb-2 group-hover:scale-110 transition">👨‍🍳</span>
                     <span class="font-bold text-amber-200">คนฟัง (เชฟ)</span>
-                    <span class="text-[11px] text-stone-400 mt-1">รับบทเชฟ เสิร์ฟคำปลอบโยนและรับฟัง</span>
+                    <span class="text-[11px] text-stone-400 mt-1">รับบทเชฟ เสิร์ฟคำปลอบโยน</span>
                 </button>
             </div>
         </div>
@@ -115,7 +104,7 @@
                         <span class="text-2xl">💬</span>
                         <div class="text-left">
                             <div class="font-bold text-sm">แชท (Chat)</div>
-                            <div class="text-[11px] text-stone-400">พูดคุยแบบพิมพ์ 1-1 ในร้าน</div>
+                            <div class="text-[11px] text-stone-400">พูดคุยแบบพิมพ์เรียลไทม์</div>
                         </div>
                     </div>
                     <span class="text-stone-500 group-hover:translate-x-1 transition">➔</span>
@@ -160,7 +149,7 @@
                 </div>
                 <div>
                     <h4 id="chatPartnerName" class="font-bold text-amber-200 text-sm">เชฟประจำร้าน (คนฟัง)</h4>
-                    <span class="text-[10px] text-emerald-400 flex items-center gap-1">● กำลังอยู่ในร้าน</span>
+                    <span class="text-[10px] text-emerald-400 flex items-center gap-1">● เชื่อมต่อกับห้องแชทเรียบร้อยแล้ว</span>
                 </div>
             </div>
             <button onclick="goToScreen('screen-2')" class="text-xs bg-stone-800/80 text-stone-300 px-3 py-1.5 rounded-lg border border-stone-700 hover:bg-stone-700 transition">ออกจากร้าน</button>
@@ -168,7 +157,6 @@
 
         <!-- Chat History Container -->
         <div id="chatHistory" class="relative z-10 flex-1 overflow-y-auto p-4 space-y-3 max-w-2xl mx-auto w-full">
-            <!-- ข้อความต้อนรับเมื่อเริ่มต้น -->
             <div class="text-center my-3">
                 <span class="text-[11px] bg-black/70 text-amber-300/90 px-4 py-1.5 rounded-full border border-amber-500/30 backdrop-blur-sm">
                     🍣 ยินดีต้อนรับสู่เคาน์เตอร์โอมะกาเสะ พื้นที่นี้พร้อมรับฟังทุกเรื่องราวของคุณ...
@@ -178,7 +166,7 @@
 
         <!-- Bottom Chat Input Bar -->
         <div class="relative z-10 p-3 bg-black/85 backdrop-blur-lg border-t border-amber-500/30">
-            <form onsubmit="handleSendMessage(event)" class="max-w-2xl mx-auto flex items-center gap-2">
+            <form id="chatForm" class="max-w-2xl mx-auto flex items-center gap-2">
                 <input id="chatInput" type="text" placeholder="พิมพ์ข้อความที่นี่..." class="flex-1 bg-stone-900/90 text-amber-100 border border-amber-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 placeholder-stone-500">
                 <button type="submit" class="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-amber-100 font-semibold px-5 py-3 rounded-xl text-sm transition flex items-center gap-1 shadow-lg shrink-0">
                     <span>ส่ง</span>
@@ -243,66 +231,122 @@
         </div>
     </div>
 
-    <script>
-        let currentRole = 'speaker';
-        let isAudioPlaying = false;
-        let onlineCount = 12; // จำนวนเริ่มต้นคนออนไลน์
+    <!-- FIREBASE REALTIME BACKEND SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // ระบบสุ่มขยับตัวเลขคนออนไลน์เพื่อความสมจริง
-        setInterval(() => {
-            const change = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
-            onlineCount = Math.max(5, onlineCount + change);
-            const countElem = document.getElementById('onlineCount');
-            if(countElem) {
-                countElem.innerText = onlineCount;
+        // ⚠️ นำค่า config จาก Firebase Console มาวางใส่ตรงนี้ ⚠️
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Global Variables
+        window.currentRole = 'speaker';
+        window.isAudioPlaying = false;
+
+        // 1. ระบบนับคนออนไลน์จริง (Presence System)
+        const connectedRef = ref(db, ".info/connected");
+        const presenceRef = ref(db, "presence");
+
+        onValue(connectedRef, (snap) => {
+            if (snap.val() === true) {
+                const userPresenceRef = push(presenceRef);
+                onDisconnect(userPresenceRef).remove();
+                set(userPresenceRef, { onlineAt: Date.now() });
             }
-        }, 5000);
+        });
 
-        function goToScreen(screenId) {
-            document.querySelectorAll('body > div').forEach(div => {
-                if (div.id.startsWith('screen-')) div.classList.add('hidden');
-            });
-            const target = document.getElementById(screenId);
-            if (target) target.classList.remove('hidden');
-        }
+        // ดึงจำนวนคนออนไลน์มาอัปเดตหน้าจอแบบ Realtime
+        onValue(presenceRef, (snap) => {
+            const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+            document.getElementById('onlineCount').innerText = count;
+        });
 
-        function startChatMode() {
-            currentRole = 'speaker';
-            document.getElementById('chatPartnerName').innerText = 'เชฟประจำร้าน (คนฟัง)';
-            document.getElementById('chatPartnerAvatar').src = 'images/HeadChee.jpg';
-            goToScreen('screen-chat');
-        }
+        // 2. ระบบแชทเรียลไทม์ (Real-time Chat)
+        const messagesRef = ref(db, "messages");
 
-        function startListenerRole() {
-            currentRole = 'listener';
-            document.getElementById('chatPartnerName').innerText = 'คุณลูกค้ารายแรก (คนพูด)';
-            document.getElementById('chatPartnerAvatar').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop';
-            goToScreen('screen-chat');
-        }
+        // รับข้อความใหม่แบบ Realtime
+        onValue(messagesRef, (snapshot) => {
+            const chatHistory = document.getElementById('chatHistory');
+            // คงไว้เฉพาะข้อความต้อนรับของระบบ
+            chatHistory.innerHTML = `
+                <div class="text-center my-3">
+                    <span class="text-[11px] bg-black/70 text-amber-300/90 px-4 py-1.5 rounded-full border border-amber-500/30 backdrop-blur-sm">
+                        🍣 ยินดีต้อนรับสู่เคาน์เตอร์โอมะกาเสะ พื้นที่นี้พร้อมรับฟังทุกเรื่องราวของคุณ...
+                    </span>
+                </div>
+            `;
 
-        // ระบบส่งข้อความแชท (ส่งตรงจากฝั่งผู้ใช้อย่างเดียว ไม่มี Auto-reply)
-        function handleSendMessage(e) {
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnap) => {
+                    const msg = childSnap.val();
+                    const isMe = msg.senderRole === window.currentRole;
+
+                    const bubble = document.createElement('div');
+                    bubble.className = isMe ? "flex justify-end mb-2" : "flex justify-start mb-2";
+                    bubble.innerHTML = `
+                        <div class="${isMe ? 'bg-amber-600 text-amber-50 rounded-tr-none' : 'bg-stone-800/95 text-amber-200 border border-amber-500/30 rounded-tl-none'} px-4 py-2.5 rounded-2xl text-sm max-w-xs shadow-md">
+                            <div class="text-[9px] text-amber-300/60 mb-0.5">${msg.senderRole === 'speaker' ? '🗣️ คนพูด' : '👨‍🍳 เชฟ'}</div>
+                            <div>${msg.text}</div>
+                        </div>
+                    `;
+                    chatHistory.appendChild(bubble);
+                });
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+        });
+
+        // ส่งข้อความลง Firebase Database
+        document.getElementById('chatForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text) return;
 
-            const chatHistory = document.getElementById('chatHistory');
-            
-            // สร้าง Bubble ข้อความ
-            const userBubble = document.createElement('div');
-            userBubble.className = "flex justify-end mb-2";
-            userBubble.innerHTML = `
-                <div class="bg-amber-600 text-amber-50 px-4 py-2.5 rounded-2xl rounded-tr-none text-sm max-w-xs shadow-md">
-                    ${text}
-                </div>
-            `;
-            chatHistory.appendChild(userBubble);
-            input.value = '';
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
+            push(messagesRef, {
+                senderRole: window.currentRole,
+                text: text,
+                timestamp: Date.now()
+            });
 
-        function spinPhone() {
+            input.value = '';
+        });
+
+        // Navigation Functions
+        window.goToScreen = function(screenId) {
+            document.querySelectorAll('body > div').forEach(div => {
+                if (div.id.startsWith('screen-')) div.classList.add('hidden');
+            });
+            const target = document.getElementById(screenId);
+            if (target) target.classList.remove('hidden');
+        };
+
+        window.startChatMode = function() {
+            window.currentRole = 'speaker';
+            document.getElementById('chatPartnerName').innerText = 'เชฟประจำร้าน (คนฟัง)';
+            document.getElementById('chatPartnerAvatar').src = 'images/HeadChee.jpg';
+            window.goToScreen('screen-chat');
+        };
+
+        window.startListenerRole = function() {
+            window.currentRole = 'listener';
+            document.getElementById('chatPartnerName').innerText = 'คุณลูกค้ารายแรก (คนพูด)';
+            document.getElementById('chatPartnerAvatar').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop';
+            window.goToScreen('screen-chat');
+        };
+
+        window.spinPhone = function() {
             const wheel = document.getElementById('rotaryWheel');
             const status = document.getElementById('phoneStatus');
             wheel.classList.add('spinning');
@@ -312,24 +356,24 @@
                 wheel.classList.remove('spinning');
                 status.innerText = "กำลังเชื่อมต่อสายไปยังเชฟผู้รับฟัง... 📞";
             }, 1200);
-        }
+        };
 
-        function handleMeetSubmit(e) {
+        window.handleMeetSubmit = function(e) {
             e.preventDefault();
             alert("บันทึกใบนัดหมายเรียบร้อยแล้ว! เชฟจะเตรียมโต๊ะโอมากาเสะรอคุณตามเวลาที่นัดหมายครับ");
-            goToScreen('screen-2');
-        }
+            window.goToScreen('screen-2');
+        };
 
-        function toggleAudio() {
+        window.toggleAudio = function() {
             const text = document.getElementById('audioText');
-            if (!isAudioPlaying) {
-                isAudioPlaying = true;
+            if (!window.isAudioPlaying) {
+                window.isAudioPlaying = true;
                 text.innerText = "เสียงบรรยากาศ: เปิด";
             } else {
-                isAudioPlaying = false;
+                window.isAudioPlaying = false;
                 text.innerText = "เสียงบรรยากาศ: ปิด";
             }
-        }
+        };
     </script>
 </body>
 </html>
