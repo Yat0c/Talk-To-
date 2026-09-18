@@ -24,7 +24,7 @@
 </head>
 <body class="text-white select-none relative w-full h-full bg-black">
 
-    <!-- Ambient Audio Toggle (ย้ายลงมาไว้มุมซ้ายล่างเพื่อไม่ให้ทับปุ่มอื่น) -->
+    <!-- Ambient Audio Toggle (ปุ่มเปิดปิดเสียงบรรยากาศอยู่มุมซ้ายล่าง) -->
     <div class="fixed bottom-4 left-4 z-50">
         <button onclick="toggleAudio()" id="audioBtn" class="bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 hover:bg-black/95 transition shadow-2xl">
             <span id="audioIcon">🔊</span>
@@ -32,8 +32,8 @@
         </button>
     </div>
 
-    <!-- SCREEN 1: FRONT RESTAURANT (รูปหน้าร้าน) -->
-    <div id="screen-1" class="absolute inset-0 w-full h-full flex flex-col items-center justify-between p-6 bg-cover bg-center fade-in" style="background-image: url('FrontRes.jpg'), url('https://images.unsplash.com/photo-1578474846511-04ba529f0b88?q=80&w=1600&auto=format&fit=crop');">
+    <!-- SCREEN 1: FRONT RESTAURANT (รูปหน้าร้านในโฟลเดอร์ images) -->
+    <div id="screen-1" class="absolute inset-0 w-full h-full flex flex-col items-center justify-between p-6 bg-cover bg-center fade-in" style="background-image: url('images/FrontRes.jpg'), url('https://images.unsplash.com/photo-1578474846511-04ba529f0b88?q=80&w=1600&auto=format&fit=crop');">
         <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-black/90"></div>
 
         <div class="relative z-10 text-center mt-16">
@@ -50,14 +50,14 @@
         </div>
     </div>
 
-    <!-- SCREEN 2: ROLE SELECTION (รูปหัวหน้าเชฟในวงกลม) -->
+    <!-- SCREEN 2: ROLE SELECTION (รูปหัวหน้าเชฟในวงกลมในโฟลเดอร์ images) -->
     <div id="screen-2" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 bg-stone-950 fade-in">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-950/30 via-stone-950 to-black"></div>
 
         <div class="relative z-10 max-w-lg w-full bg-stone-900/90 border border-amber-600/30 rounded-3xl p-8 backdrop-blur-xl text-center shadow-2xl">
             <!-- Circular Chef Avatar -->
             <div class="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-amber-500/60 shadow-2xl mb-4 relative bg-stone-800">
-                <img src="HeadChee.jpg" onerror="this.src='https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=800&auto=format&fit=crop'" alt="Head Chef" class="w-full h-full object-cover">
+                <img src="images/HeadChee.jpg" onerror="this.src='https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=800&auto=format&fit=crop'" alt="Head Chef" class="w-full h-full object-cover">
                 <div class="absolute bottom-0 inset-x-0 bg-black/80 py-1 text-[10px] text-amber-300 font-medium">หัวหน้าเชฟประจำร้าน</div>
             </div>
 
@@ -125,15 +125,15 @@
         </div>
     </div>
 
-    <!-- SCREEN: CHAT (รูปฉากในร้าน + ช่องข้อความอยู่ด้านล่าง) -->
-    <div id="screen-chat" class="hidden absolute inset-0 w-full h-full flex flex-col justify-between bg-cover bg-center fade-in" style="background-image: url('inRes.jpg'), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1600&auto=format&fit=crop');">
+    <!-- SCREEN: CHAT (รูปฉากในร้านในโฟลเดอร์ images + ช่องข้อความอยู่ด้านล่าง) -->
+    <div id="screen-chat" class="hidden absolute inset-0 w-full h-full flex flex-col justify-between bg-cover bg-center fade-in" style="background-image: url('images/inRes.jpg'), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1600&auto=format&fit=crop');">
         <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90"></div>
 
         <!-- Header -->
         <div class="relative z-10 p-4 bg-black/70 backdrop-blur-md border-b border-amber-500/20 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-amber-600/30 border border-amber-400 overflow-hidden shrink-0">
-                    <img id="chatPartnerAvatar" src="HeadChee.jpg" onerror="this.src='https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=400&auto=format&fit=crop'" class="w-full h-full object-cover">
+                    <img id="chatPartnerAvatar" src="images/HeadChee.jpg" onerror="this.src='https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=400&auto=format&fit=crop'" class="w-full h-full object-cover">
                 </div>
                 <div>
                     <h4 id="chatPartnerName" class="font-bold text-amber-200 text-sm">เชฟประจำร้าน (คนฟัง)</h4>
@@ -234,7 +234,7 @@
         function startChatMode() {
             currentRole = 'speaker';
             document.getElementById('chatPartnerName').innerText = 'เชฟประจำร้าน (คนฟัง)';
-            document.getElementById('chatPartnerAvatar').src = 'HeadChee.jpg';
+            document.getElementById('chatPartnerAvatar').src = 'images/HeadChee.jpg';
             goToScreen('screen-chat');
         }
 
