@@ -1,746 +1,316 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Talk To Omakase - ร้านพักใจโอมะกาเสะ</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            wood: {
-              100: '#EBD9B4',
-              300: '#C9A66B',
-              600: '#8c5a2b',
-              800: '#4A2E16',
-              900: '#2A180A',
-            },
-            noren: '#8B0000',
-            paper: '#FBF8EF',
-            warmdark: '#120C08',
-            sushi: '#FF6B6B'
-          },
-          fontFamily: {
-            thai: ['Kanit', 'sans-serif'],
-            jp: ['Noto Serif JP', 'serif']
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talk To Omakase - ร้านพักใจโอมะกาเสะ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Prompt', sans-serif; box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: #000; }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
+        
+        .rotary-dial { transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .spinning { animation: spinDial 1.2s ease-in-out; }
+        @keyframes spinDial {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(280deg); }
+            100% { transform: rotate(0deg); }
         }
-      }
-    }
-  </script>
-  <style>
-    body {
-      font-family: 'Kanit', sans-serif;
-      background-color: #0d0805;
-      color: #ebd9b4;
-      overflow-x: hidden;
-      user-select: none;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 15px rgba(255, 180, 100, 0.4)); }
-      50% { opacity: 0.9; filter: drop-shadow(0 0 25px rgba(255, 200, 120, 0.7)); }
-    }
-    
-    .lantern-glow {
-      animation: pulseGlow 4s infinite ease-in-out;
-    }
-
-    /* Rotary phone animation */
-    @keyframes spinRotary {
-      0% { transform: rotate(0deg); }
-      70% { transform: rotate(180deg); }
-      100% { transform: rotate(0deg); }
-    }
-
-    .dial-spinning {
-      animation: spinRotary 1.2s ease-in-out;
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #1a0f0a;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #5c3818;
-      border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #8c5a2b;
-    }
-
-    .paper-texture {
-      background-color: #f7f3e8;
-      background-image: radial-gradient(#d6cbb5 0.75px, transparent 0.75px);
-      background-size: 12px 12px;
-    }
-
-    /* Screen Transitions */
-    .screen {
-      transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
-    }
-    .screen-hidden {
-      opacity: 0;
-      pointer-events: none;
-      transform: scale(0.98);
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+    </style>
 </head>
-<body class="h-screen w-screen flex flex-col justify-between relative overflow-hidden">
+<body class="text-white select-none relative w-full h-full bg-black">
 
-  <header class="z-50 px-6 py-4 flex justify-between items-center bg-wood-900/80 backdrop-blur border-b border-wood-800/50 text-wood-100 shadow-lg">
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="goToScreen('screen-1')">
-      <div class="w-8 h-8 rounded-full bg-noren flex items-center justify-center text-white font-jp font-bold shadow">
-        心
-      </div>
-      <div>
-        <h1 class="text-lg font-semibold tracking-wider text-wood-100 font-jp">Talk To Omakase</h1>
-        <p class="text-xs text-wood-300/80">ร้านพักใจโอมะกาเสะ • 1-on-1 Emotional Bar</p>
-      </div>
+    <!-- Ambient Audio Toggle (ย้ายลงมาไว้มุมซ้ายล่างเพื่อไม่ให้ทับปุ่มอื่น) -->
+    <div class="fixed bottom-4 left-4 z-50">
+        <button onclick="toggleAudio()" id="audioBtn" class="bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 hover:bg-black/95 transition shadow-2xl">
+            <span id="audioIcon">🔊</span>
+            <span id="audioText">เสียงบรรยากาศ: ปิด</span>
+        </button>
     </div>
 
-    <!-- Controls -->
-    <div class="flex items-center space-x-4">
-      <button id="audio-toggle" onclick="toggleAmbientAudio()" class="px-3 py-1.5 rounded-full bg-wood-800/70 hover:bg-wood-600 text-xs flex items-center gap-2 border border-wood-600/40 transition">
-        <i class="fa-solid fa-music text-amber-400"></i>
-        <span id="audio-label">เปิดเสียงบรรยากาศ</span>
-      </button>
+    <!-- SCREEN 1: FRONT RESTAURANT (รูปหน้าร้าน) -->
+    <div id="screen-1" class="absolute inset-0 w-full h-full flex flex-col items-center justify-between p-6 bg-cover bg-center fade-in" style="background-image: url('FrontRes.jpg'), url('https://images.unsplash.com/photo-1578474846511-04ba529f0b88?q=80&w=1600&auto=format&fit=crop');">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-black/90"></div>
 
-      <button onclick="goToScreen('screen-2')" class="px-3 py-1.5 rounded-full bg-wood-800/70 hover:bg-wood-600 text-xs flex items-center gap-2 border border-wood-600/40 transition">
-        <i class="fa-solid fa-arrows-rotate"></i>
-        <span>เปลี่ยนบทบาท</span>
-      </button>
+        <div class="relative z-10 text-center mt-16">
+            <span class="inline-block px-4 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs tracking-widest border border-amber-500/30 mb-3 backdrop-blur-sm">WELCOME TO EMOTIONAL BAR</span>
+            <h1 class="text-5xl md:text-7xl font-bold tracking-wider text-amber-100 drop-shadow-2xl">Talk To ?</h1>
+            <p class="text-amber-200/90 text-sm md:text-base mt-2 max-w-md mx-auto drop-shadow">ยินดีต้อนรับสู่ร้านพักใจโอมะกาเสะ พื้นที่ปลอดภัยที่พร้อมรับฟังทุกความรู้สึกของคุณ</p>
+        </div>
+
+        <div class="relative z-10 mb-16">
+            <button onclick="goToScreen('screen-2')" class="group relative px-8 py-3.5 bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100 font-semibold rounded-full shadow-2xl border border-amber-400/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+                <span>เลื่อนฉากเข้าสู่ร้าน</span>
+                <span class="group-hover:translate-x-1 transition-transform">🚪</span>
+            </button>
+        </div>
     </div>
-  </header>
 
-  <!-- MAIN CONTAINER FOR ALL SCREENS -->
-  <main class="relative flex-1 w-full h-full max-w-6xl mx-auto p-2 sm:p-4 md:p-6 flex items-center justify-center">
+    <!-- SCREEN 2: ROLE SELECTION (รูปหัวหน้าเชฟในวงกลม) -->
+    <div id="screen-2" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 bg-stone-950 fade-in">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-950/30 via-stone-950 to-black"></div>
 
-    <!-- SCREEN 1: ENTRANCE / LOADING (Storyboard Box 1) -->
-    <section id="screen-1" class="screen w-full h-full max-h-[750px] bg-gradient-to-b from-warmdark via-wood-900 to-black rounded-2xl border border-wood-800/60 shadow-2xl overflow-hidden flex flex-col justify-between items-center relative p-6">
-      <!-- Background Entrance Aesthetic -->
-      <div class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(#8c5a2b_1px,transparent_1px)] [background-size:16px_16px]"></div>
-      
-      <!-- Japanese Lantern Left/Right -->
-      <div class="absolute top-10 left-8 sm:left-16 flex flex-col items-center lantern-glow">
-        <div class="w-12 h-20 bg-amber-500/80 border-2 border-wood-800 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/20">
-          <span class="text-wood-900 font-jp font-bold text-lg write-vertical">おまかせ</span>
-        </div>
-        <div class="w-1 h-12 bg-wood-800"></div>
-      </div>
-      
-      <div class="absolute top-10 right-8 sm:right-16 flex flex-col items-center lantern-glow">
-        <div class="w-12 h-20 bg-amber-500/80 border-2 border-wood-800 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/20">
-          <span class="text-wood-900 font-jp font-bold text-lg write-vertical">傾聽</span>
-        </div>
-        <div class="w-1 h-12 bg-wood-800"></div>
-      </div>
-
-      <!-- Entrance Door & Noren -->
-      <div class="mt-8 text-center z-10">
-        <span class="px-4 py-1 rounded-full bg-wood-800/60 border border-wood-600/40 text-amber-200 text-xs tracking-widest uppercase">Welcome Friend</span>
-        <h2 class="text-3xl sm:text-4xl font-bold font-jp text-wood-100 mt-2">Talk To ?</h2>
-        <p class="text-wood-300 text-sm mt-1">ยินดีต้อนรับสู่พื้นที่พักใจ ที่พร้อมรับฟังทุกเรื่องราวของคุณ</p>
-      </div>
-
-      <!-- Interactive Entrance Door Graphic -->
-      <div class="relative w-72 sm:w-80 h-80 my-auto flex flex-col items-center justify-end group cursor-pointer" onclick="goToScreen('screen-2')">
-        <!-- Noren Curtains -->
-        <div class="absolute top-0 w-full h-24 bg-noren rounded-t-sm shadow-xl border-b-2 border-amber-600/50 flex justify-around px-2 pt-2 z-20">
-          <div class="w-1/3 h-full border-r border-red-900/50 flex items-center justify-center text-amber-100 font-jp text-lg font-bold">話</div>
-          <div class="w-1/3 h-full border-r border-red-900/50 flex items-center justify-center text-amber-100 font-jp text-lg font-bold">心</div>
-          <div class="w-1/3 h-full flex items-center justify-center text-amber-100 font-jp text-lg font-bold">聴</div>
-        </div>
-
-        <!-- Door Frame -->
-        <div class="w-full h-64 border-t-8 border-x-8 border-wood-800 bg-wood-900/90 relative overflow-hidden flex items-center justify-center shadow-2xl group-hover:border-wood-600 transition">
-          <!-- Warm light inside -->
-          <div class="absolute inset-0 bg-gradient-to-t from-amber-600/30 via-amber-500/10 to-transparent group-hover:opacity-100 transition duration-500"></div>
-          
-          <!-- Silhouette figure inside -->
-          <div class="w-12 h-28 bg-wood-900 rounded-t-full opacity-80 group-hover:scale-105 transition duration-300 flex items-center justify-center border-t border-amber-500/30">
-            <i class="fa-solid fa-user-ninja text-amber-400/40 text-2xl"></i>
-          </div>
-        </div>
-
-        <!-- Entry Stairs Base -->
-        <div class="w-96 h-4 bg-wood-800 rounded-sm border-t border-wood-600/50"></div>
-        <div class="w-80 h-3 bg-wood-900 rounded-b-sm border-t border-wood-800"></div>
-      </div>
-
-      <div class="z-10 pb-4">
-        <button onclick="goToScreen('screen-2')" class="px-8 py-3 bg-gradient-to-r from-amber-600 to-wood-600 hover:from-amber-500 hover:to-wood-500 text-amber-950 font-bold rounded-xl shadow-lg transform hover:-translate-y-0.5 transition active:translate-y-0 flex items-center gap-2">
-          <span>เลื่อนฉากเข้าสู่ร้าน</span>
-          <i class="fa-solid fa-door-open"></i>
-        </button>
-      </div>
-    </section>
-
-    <!-- SCREEN 2: ROLE SELECTION (Storyboard Box 2) -->
-    <section id="screen-2" class="screen screen-hidden w-full h-full max-h-[750px] bg-gradient-to-b from-wood-900 via-warmdark to-black rounded-2xl border border-wood-800/60 shadow-2xl overflow-hidden flex flex-col justify-between items-center p-6 relative">
-      <div class="text-center mt-2">
-        <span class="text-amber-400 font-jp text-xs tracking-widest">役割を選択してください</span>
-        <h2 class="text-2xl sm:text-3xl font-bold text-wood-100">เลือกบทบาทของคุณในวันนี้</h2>
-        <p class="text-xs text-wood-300 mt-1">คุณต้องการพูดระบาย หรือสวมบทเป็นเชฟผู้รับฟัง?</p>
-      </div>
-
-      <!-- Storyboard Character Art: Chef holding Menu Sign "พูด / ฟัง" -->
-      <div class="my-auto flex flex-col items-center justify-center relative max-w-md w-full">
-        <!-- Host Character Avatar -->
-        <div class="relative flex flex-col items-center mb-4">
-          <div class="w-24 h-24 rounded-full bg-wood-800 border-4 border-amber-600/60 overflow-hidden shadow-xl flex items-center justify-center relative">
-            <!-- Cool glasses avatar representing host/chef from drawing -->
-            <div class="w-full h-full bg-amber-900/40 flex flex-col items-center justify-center">
-              <!-- Chef Headband -->
-              <div class="w-full h-4 bg-paper text-[9px] font-bold text-black flex items-center justify-center tracking-tighter">おまかせ</div>
-              <!-- Glasses -->
-              <div class="flex gap-1 my-1">
-                <div class="w-6 h-4 bg-black rounded-sm border border-amber-400/60"></div>
-                <div class="w-6 h-4 bg-black rounded-sm border border-amber-400/60"></div>
-              </div>
-              <!-- Smile -->
-              <div class="w-4 h-1 border-b-2 border-amber-300 rounded-full"></div>
+        <div class="relative z-10 max-w-lg w-full bg-stone-900/90 border border-amber-600/30 rounded-3xl p-8 backdrop-blur-xl text-center shadow-2xl">
+            <!-- Circular Chef Avatar -->
+            <div class="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-amber-500/60 shadow-2xl mb-4 relative bg-stone-800">
+                <img src="HeadChee.jpg" onerror="this.src='https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=800&auto=format&fit=crop'" alt="Head Chef" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 inset-x-0 bg-black/80 py-1 text-[10px] text-amber-300 font-medium">หัวหน้าเชฟประจำร้าน</div>
             </div>
-          </div>
-          <span class="mt-2 px-3 py-0.5 rounded-full bg-wood-800 border border-wood-600 text-xs text-amber-200">หัวหน้าเชฟประจำร้าน</span>
+
+            <h2 class="text-2xl font-bold text-amber-200">เลือกบทบาทของคุณ</h2>
+            <p class="text-stone-400 text-xs mt-1 mb-6">วันนี้คุณต้องการเข้ามาในร้านในฐานะอะไร?</p>
+
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="goToScreen('screen-speaker-options')" class="p-5 rounded-2xl bg-gradient-to-br from-amber-900/40 to-stone-800 border border-amber-500/30 hover:border-amber-400 hover:scale-102 transition flex flex-col items-center text-center group">
+                    <span class="text-3xl mb-2 group-hover:scale-110 transition">🗣️</span>
+                    <span class="font-bold text-amber-200">คนพูด</span>
+                    <span class="text-[11px] text-stone-400 mt-1">ต้องการระบายความรู้สึก ปลดปล่อยความเครียด</span>
+                </button>
+
+                <button onclick="startListenerRole()" class="p-5 rounded-2xl bg-gradient-to-br from-stone-800 to-stone-900 border border-amber-500/20 hover:border-amber-400 hover:scale-102 transition flex flex-col items-center text-center group">
+                    <span class="text-3xl mb-2 group-hover:scale-110 transition">👨‍🍳</span>
+                    <span class="font-bold text-amber-200">คนฟัง (เชฟ)</span>
+                    <span class="text-[11px] text-stone-400 mt-1">รับบทเชฟ เสิร์ฟคำปลอบโยนและรับฟัง</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: SPEAKER OPTIONS -->
+    <div id="screen-speaker-options" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 bg-stone-950 fade-in">
+        <div class="relative z-10 max-w-md w-full bg-stone-900/90 border border-amber-600/30 rounded-3xl p-6 backdrop-blur-xl text-center shadow-2xl">
+            <h3 class="text-xl font-bold text-amber-200 mb-1">เลือกรูปแบบการพูดคุย</h3>
+            <p class="text-stone-400 text-xs mb-6">คุณสบายใจที่จะระบายผ่านช่องทางไหน?</p>
+
+            <div class="space-y-3">
+                <button onclick="startChatMode()" class="w-full p-4 rounded-xl bg-stone-800/80 hover:bg-amber-900/40 border border-amber-500/30 text-amber-100 flex items-center justify-between px-6 transition group">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">💬</span>
+                        <div class="text-left">
+                            <div class="font-bold text-sm">แชท (Chat)</div>
+                            <div class="text-[11px] text-stone-400">พูดคุยแบบพิมพ์ 1-1 ในร้าน</div>
+                        </div>
+                    </div>
+                    <span class="text-stone-500 group-hover:translate-x-1 transition">➔</span>
+                </button>
+
+                <button onclick="goToScreen('screen-phone')" class="w-full p-4 rounded-xl bg-stone-800/80 hover:bg-amber-900/40 border border-amber-500/30 text-amber-100 flex items-center justify-between px-6 transition group">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📞</span>
+                        <div class="text-left">
+                            <div class="font-bold text-sm">โทร (Call)</div>
+                            <div class="text-[11px] text-stone-400">หมุนโทรศัพท์รุ่นเก่าเพื่อยกหูโทร</div>
+                        </div>
+                    </div>
+                    <span class="text-stone-500 group-hover:translate-x-1 transition">➔</span>
+                </button>
+
+                <button onclick="goToScreen('screen-meet')" class="w-full p-4 rounded-xl bg-stone-800/80 hover:bg-amber-900/40 border border-amber-500/30 text-amber-100 flex items-center justify-between px-6 transition group">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📅</span>
+                        <div class="text-left">
+                            <div class="font-bold text-sm">เจอ (Meet)</div>
+                            <div class="text-[11px] text-stone-400">กรอกใบนัดหมายสถานที่และเวลา</div>
+                        </div>
+                    </div>
+                    <span class="text-stone-500 group-hover:translate-x-1 transition">➔</span>
+                </button>
+            </div>
+
+            <button onclick="goToScreen('screen-2')" class="mt-6 text-xs text-stone-500 hover:text-stone-300 transition">← ย้อนกลับไปเลือกบทบาท</button>
+        </div>
+    </div>
+
+    <!-- SCREEN: CHAT (รูปฉากในร้าน + ช่องข้อความอยู่ด้านล่าง) -->
+    <div id="screen-chat" class="hidden absolute inset-0 w-full h-full flex flex-col justify-between bg-cover bg-center fade-in" style="background-image: url('inRes.jpg'), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1600&auto=format&fit=crop');">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90"></div>
+
+        <!-- Header -->
+        <div class="relative z-10 p-4 bg-black/70 backdrop-blur-md border-b border-amber-500/20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-600/30 border border-amber-400 overflow-hidden shrink-0">
+                    <img id="chatPartnerAvatar" src="HeadChee.jpg" onerror="this.src='https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=400&auto=format&fit=crop'" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h4 id="chatPartnerName" class="font-bold text-amber-200 text-sm">เชฟประจำร้าน (คนฟัง)</h4>
+                    <span class="text-[10px] text-emerald-400 flex items-center gap-1">● กำลังรับฟังอยู่ในร้าน</span>
+                </div>
+            </div>
+            <button onclick="goToScreen('screen-2')" class="text-xs bg-stone-800/80 text-stone-300 px-3 py-1.5 rounded-lg border border-stone-700 hover:bg-stone-700 transition">ออกจากร้าน</button>
         </div>
 
-        <!-- Menu Board with 2 Choices -->
-        <div class="w-full bg-wood-800/90 p-6 rounded-2xl border-2 border-amber-600/50 shadow-2xl backdrop-blur relative">
-          <div class="text-center pb-4 mb-4 border-b border-wood-600/40">
-            <h3 class="font-jp font-bold text-xl text-amber-300">เมนูเลือกบทบาท (พูด / ฟัง)</h3>
-          </div>
+        <!-- Chat History Container -->
+        <div id="chatHistory" class="relative z-10 flex-1 overflow-y-auto p-4 space-y-3 max-w-2xl mx-auto w-full">
+            <div class="text-center my-3">
+                <span class="text-[11px] bg-black/70 text-amber-300/90 px-4 py-1.5 rounded-full border border-amber-500/30 backdrop-blur-sm">
+                    🍣 ยินดีต้อนรับสู่เคาน์เตอร์โอมะกาเสะ พิมพ์ระบายความรู้สึกของคุณได้เลย...
+                </span>
+            </div>
+        </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Option 1: Speaker (คนพูด) -->
-            <button onclick="selectRole('speaker')" class="p-5 rounded-xl bg-gradient-to-br from-amber-950/80 to-wood-900 border border-amber-500/40 hover:border-amber-400 hover:bg-amber-900/50 transition flex flex-col items-center text-center group">
-              <div class="w-12 h-12 rounded-full bg-amber-600/20 flex items-center justify-center text-amber-400 text-xl group-hover:scale-110 transition">
-                <i class="fa-solid fa-comment-dots"></i>
-              </div>
-              <h4 class="text-lg font-bold text-amber-200 mt-3">คนพูด (ระบาย)</h4>
-              <p class="text-xs text-wood-300 mt-1">ต้องการพื้นที่ปลดปล่อยความรู้สึก แชท โทร หรือนัดเจอ</p>
-              <span class="mt-3 px-3 py-1 rounded bg-amber-600/30 text-amber-300 text-xs font-semibold">เลือก Speak</span>
+        <!-- Bottom Chat Input Bar -->
+        <div class="relative z-10 p-3 bg-black/85 backdrop-blur-lg border-t border-amber-500/30 pl-36 md:pl-3">
+            <form onsubmit="handleSendMessage(event)" class="max-w-2xl mx-auto flex items-center gap-2">
+                <input id="chatInput" type="text" placeholder="พิมพ์ข้อความระบายความในใจที่นี่..." class="flex-1 bg-stone-900/90 text-amber-100 border border-amber-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 placeholder-stone-500">
+                <button type="submit" class="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-amber-100 font-semibold px-5 py-3 rounded-xl text-sm transition flex items-center gap-1 shadow-lg shrink-0">
+                    <span>ส่ง</span>
+                    <span>🍣</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCREEN: OLD ROTARY PHONE -->
+    <div id="screen-phone" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 bg-stone-950 fade-in">
+        <div class="relative z-10 max-w-md w-full bg-stone-900/90 border border-amber-600/30 rounded-3xl p-8 backdrop-blur-xl text-center shadow-2xl">
+            <h3 class="text-xl font-bold text-amber-200 mb-1">สายด่วนพักใจ</h3>
+            <p id="phoneStatus" class="text-stone-400 text-xs mb-6">กดหมุนเพื่อโทรออกหากต้องการคนรับฟัง</p>
+
+            <div class="relative w-48 h-48 mx-auto my-4 bg-stone-800 rounded-full border-4 border-amber-600/50 flex items-center justify-center shadow-2xl">
+                <div id="rotaryWheel" class="rotary-dial absolute inset-2 rounded-full border-2 border-dashed border-amber-400/40 flex items-center justify-center cursor-pointer" onclick="spinPhone()">
+                    <span class="text-4xl">📞</span>
+                </div>
+                <div class="w-16 h-16 rounded-full bg-stone-900 border border-amber-500/30 flex items-center justify-center text-amber-300 font-bold text-xs">
+                    OMAKASE
+                </div>
+            </div>
+
+            <button onclick="spinPhone()" class="w-full py-3 bg-amber-700 hover:bg-amber-600 text-amber-100 font-semibold rounded-xl text-sm transition mt-4 shadow-lg">
+                🌀 หมุนจานโทรศัพท์
             </button>
-
-            <!-- Option 2: Listener (คนฟัง / เชฟ) -->
-            <button onclick="selectRole('listener')" class="p-5 rounded-xl bg-gradient-to-br from-wood-900 to-amber-950/80 border border-wood-600/40 hover:border-amber-400 hover:bg-amber-900/50 transition flex flex-col items-center text-center group">
-              <div class="w-12 h-12 rounded-full bg-red-900/40 flex items-center justify-center text-red-400 text-xl group-hover:scale-110 transition">
-                <i class="fa-solid fa-utensils"></i>
-              </div>
-              <h4 class="text-lg font-bold text-amber-200 mt-3">คนฟัง (เชฟ Omakase)</h4>
-              <p class="text-xs text-wood-300 mt-1">รับบทเป็นเชฟ คอยเสิร์ฟความอบอุ่นและรับฟังผู้มาเยือน</p>
-              <span class="mt-3 px-3 py-1 rounded bg-red-900/40 text-red-300 text-xs font-semibold">เลือก Listen</span>
-            </button>
-          </div>
+            <button onclick="goToScreen('screen-speaker-options')" class="mt-4 text-xs text-stone-500 hover:text-stone-300 transition">← ย้อนกลับ</button>
         </div>
-      </div>
+    </div>
 
-      <div class="text-xs text-wood-300/60 pb-2">
-        <i class="fa-solid fa-shield-halved mr-1"></i> ทุกการสนทนาเป็นความลับและเน้นการเยียวยาจิตใจ
-      </div>
-    </section>
-
-    <!-- SCREEN 3: SPEAKER MODE SELECTION (Storyboard Box 3 - พูด: แชท / โทร / เจอ) -->
-    <section id="screen-speaker-options" class="screen screen-hidden w-full h-full max-h-[750px] bg-gradient-to-b from-wood-900 via-warmdark to-black rounded-2xl border border-wood-800/60 shadow-2xl overflow-hidden flex flex-col justify-between items-center p-6">
-      <div class="text-center mt-2">
-        <span class="text-amber-400 font-jp text-xs tracking-widest">対話形式を選択</span>
-        <h2 class="text-2xl sm:text-3xl font-bold text-wood-100">คุณอยากระบายในรูปแบบไหน?</h2>
-        <p class="text-xs text-wood-300 mt-1">เลือกช่องทางที่คุณรู้สึกสบายใจที่สุดในตอนนี้</p>
-      </div>
-
-      <!-- 3 Choice Cards based on Storyboard Panel 3 -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl my-auto">
-        <!-- Option A: Chat (แชท) -->
-        <div onclick="goToScreen('screen-chat')" class="bg-wood-800/60 hover:bg-wood-800/90 border border-amber-600/30 hover:border-amber-400 p-6 rounded-2xl cursor-pointer transition transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg group">
-          <div class="w-16 h-16 rounded-2xl bg-amber-600/20 flex items-center justify-center text-amber-400 text-2xl group-hover:scale-110 transition mb-4">
-            <i class="fa-solid fa-comments"></i>
-          </div>
-          <h3 class="text-xl font-bold text-amber-200">1. แชท</h3>
-          <p class="text-xs text-wood-300 mt-2 leading-relaxed">
-            เฟดเข้าสู่เคาน์เตอร์โอมากาเสะ พุดคุยแบบ 1-ต่อ-1 กับเชฟรับฟังแบบเรียลไทม์
-          </p>
-          <span class="mt-4 px-4 py-1.5 rounded-full bg-amber-500 text-wood-900 font-semibold text-xs shadow">เริ่มแชททันที</span>
-        </div>
-
-        <!-- Option B: Call (โทร) -->
-        <div onclick="goToScreen('screen-phone')" class="bg-wood-800/60 hover:bg-wood-800/90 border border-amber-600/30 hover:border-amber-400 p-6 rounded-2xl cursor-pointer transition transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg group">
-          <div class="w-16 h-16 rounded-2xl bg-amber-600/20 flex items-center justify-center text-amber-400 text-2xl group-hover:scale-110 transition mb-4">
-            <i class="fa-solid fa-phone-volume"></i>
-          </div>
-          <h3 class="text-xl font-bold text-amber-200">2. โทร</h3>
-          <p class="text-xs text-wood-300 mt-2 leading-relaxed">
-            หมุนโทรศัพท์รุ่นเก่าวินเทจ เพื่อยกหูสายตรงพูดคุยด้วยเสียงกับผู้ฟัง
-          </p>
-          <span class="mt-4 px-4 py-1.5 rounded-full bg-amber-500 text-wood-900 font-semibold text-xs shadow">ยกหูโทรศัพท์</span>
-        </div>
-
-        <!-- Option C: Meet (เจอ) -->
-        <div onclick="goToScreen('screen-appointment')" class="bg-wood-800/60 hover:bg-wood-800/90 border border-amber-600/30 hover:border-amber-400 p-6 rounded-2xl cursor-pointer transition transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg group">
-          <div class="w-16 h-16 rounded-2xl bg-amber-600/20 flex items-center justify-center text-amber-400 text-2xl group-hover:scale-110 transition mb-4">
-            <i class="fa-solid fa-calendar-check"></i>
-          </div>
-          <h3 class="text-xl font-bold text-amber-200">3. เจอ</h3>
-          <p class="text-xs text-wood-300 mt-2 leading-relaxed">
-            กรอกใบนัดหมายวัน เวลา และสถานที่ เพื่อพูดคุยพบเจอกันที่ร้านจริง
-          </p>
-          <span class="mt-4 px-4 py-1.5 rounded-full bg-amber-500 text-wood-900 font-semibold text-xs shadow">กรอกใบนัด</span>
-        </div>
-      </div>
-
-      <button onclick="goToScreen('screen-2')" class="text-xs text-wood-300 hover:text-amber-200 flex items-center gap-1">
-        <i class="fa-solid fa-arrow-left"></i> ย้อนกลับไปหน้าเลือกบทบาท
-      </button>
-    </section>
-
-    <!-- SCREEN 4: CHAT INTERFACE - SPEAKER & LISTENER COUNTER (Storyboard Panel: แชท / ฟัง) -->
-    <section id="screen-chat" class="screen screen-hidden w-full h-full max-h-[750px] bg-gradient-to-b from-wood-900 via-warmdark to-black rounded-2xl border border-wood-800/60 shadow-2xl overflow-hidden flex flex-col justify-between">
-      
-      <!-- Top Omakase Counter Scene Graphic -->
-      <div class="h-44 bg-gradient-to-b from-amber-950/60 to-wood-900/90 border-b border-wood-700/50 p-4 relative flex items-center justify-between overflow-hidden">
-        <!-- Background elements: Japanese Scroll & Light -->
-        <div class="absolute inset-0 bg-[radial-gradient(#c9a66b_1px,transparent_1px)] [background-size:12px_12px] opacity-10"></div>
-        
-        <!-- Chef Side (Left/Center) -->
-        <div class="flex items-center space-x-4 z-10">
-          <div class="relative">
-            <div class="w-16 h-16 rounded-full bg-wood-800 border-2 border-amber-400 flex items-center justify-center text-amber-200 shadow-md">
-              <i class="fa-solid fa-user-ninja text-3xl"></i>
+    <!-- SCREEN: MEET APPOINTMENT FORM -->
+    <div id="screen-meet" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 bg-stone-950 fade-in">
+        <div class="relative z-10 max-w-md w-full bg-amber-100 text-stone-900 rounded-2xl p-6 shadow-2xl border-4 border-amber-900">
+            <div class="text-center border-b border-amber-800/30 pb-3 mb-4">
+                <h3 class="text-xl font-bold text-amber-950 tracking-wide">ใบนัดหมายล่วงหน้า</h3>
+                <p class="text-[10px] text-amber-800 tracking-wider">OMAKASE CONFIDENTIAL RESERVATION</p>
             </div>
-            <span class="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-wood-900 rounded-full" title="Online"></span>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 id="chat-counter-role-title" class="font-bold text-amber-200 text-lg">เชฟโอมากาเสะ (ผู้รับฟัง)</h3>
-              <span class="text-[10px] bg-amber-900/80 text-amber-300 border border-amber-600/40 px-2 py-0.5 rounded">1-on-1 Private Counter</span>
-            </div>
-            <p class="text-xs text-wood-300 mt-0.5">"วันนี้มีเรื่องหนักใจอะไร อยากให้เชฟรับฟังไหมครับ?"</p>
-          </div>
+
+            <form onsubmit="handleMeetSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-amber-900 mb-1">สถานที่นัดหมาย:</label>
+                    <select class="w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none">
+                        <option>ร้านพักใจ สาขาเอกมัย (ห้องส่วนตัว)</option>
+                        <option>ร้านพักใจ สาขาอารีย์ (โซนสวน)</option>
+                        <option>สถานที่เงียบสงบตามตกลง</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-amber-900 mb-1">วันที่:</label>
+                    <input type="date" required class="w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-bold text-amber-900 mb-1">เวลา:</label>
+                    <input type="time" required class="w-full bg-amber-50 border border-amber-800/40 rounded p-2.5 text-stone-800 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full py-3 bg-amber-900 hover:bg-amber-950 text-amber-100 font-bold rounded-lg mt-4 transition shadow-md">
+                    ยืนยันใบนัดหมาย 📜
+                </button>
+            </form>
+            <button onclick="goToScreen('screen-speaker-options')" class="w-full text-center mt-3 text-xs text-amber-800 hover:underline">← ย้อนกลับ</button>
         </div>
+    </div>
 
-        <!-- Serving Plate Visual -->
-        <div class="hidden sm:flex flex-col items-center justify-center bg-wood-800/80 p-2 rounded-xl border border-wood-600/40 z-10">
-          <span class="text-[10px] text-amber-300 font-jp">คอร์สเยียวยาจิตใจ</span>
-          <div id="current-sushi-dish" class="text-2xl my-1 animate-bounce">🍣</div>
-          <span id="dish-name" class="text-[10px] text-wood-100">คำที่ 1: แซลมอนรับฟัง</span>
-        </div>
-      </div>
+    <script>
+        let currentRole = 'speaker';
+        let isAudioPlaying = false;
 
-      <!-- Chat Messages Container -->
-      <div id="chat-messages-box" class="flex-1 p-4 overflow-y-auto space-y-3 bg-warmdark/80">
-        <!-- System Welcome Message -->
-        <div class="flex justify-center">
-          <div class="bg-wood-900/70 border border-wood-700/40 text-wood-300 text-xs px-4 py-2 rounded-full text-center">
-            ⛩️ บรรยากาศเงียบสงบในร้านโอมากาเสะเริ่มขึ้นแล้ว... สามารถระบายได้ทุกเรื่อง
-          </div>
-        </div>
+        function goToScreen(screenId) {
+            document.querySelectorAll('body > div').forEach(div => {
+                if (div.id.startsWith('screen-')) div.classList.add('hidden');
+            });
+            const target = document.getElementById(screenId);
+            if (target) target.classList.remove('hidden');
+        }
 
-        <!-- Message Bubble Listener -->
-        <div class="flex gap-3 items-end">
-          <div class="w-8 h-8 rounded-full bg-wood-800 flex items-center justify-center text-xs text-amber-300 border border-amber-500/40">シェフ</div>
-          <div class="max-w-[75%] bg-wood-800/90 text-amber-100 p-3 rounded-2xl rounded-bl-none text-sm border border-wood-700/50 shadow">
-            ยินดีต้อนรับสู่เคาน์เตอร์ครับ เชฟเตรียมพื้นที่ปลอดภัยไว้ให้คุณแล้ว พร้อมเล่าเรื่องราวของคุณหรือยังครับ?
-          </div>
-        </div>
-      </div>
+        function startChatMode() {
+            currentRole = 'speaker';
+            document.getElementById('chatPartnerName').innerText = 'เชฟประจำร้าน (คนฟัง)';
+            document.getElementById('chatPartnerAvatar').src = 'HeadChee.jpg';
+            goToScreen('screen-chat');
+        }
 
-      <!-- Chat Input Field -->
-      <div class="p-3 bg-wood-900 border-t border-wood-800/80 flex items-center gap-2">
-        <!-- Quick Emoji Reactions -->
-        <button onclick="sendQuickEmoji('🍣')" class="p-2 rounded-lg bg-wood-800 hover:bg-wood-700 text-sm" title="ส่งซูชิ">🍣</button>
-        <button onclick="sendQuickEmoji('🍵')" class="p-2 rounded-lg bg-wood-800 hover:bg-wood-700 text-sm" title="ส่งชาเขียวร้อน">🍵</button>
-        <button onclick="sendQuickEmoji('❤️')" class="p-2 rounded-lg bg-wood-800 hover:bg-wood-700 text-sm" title="ส่งกำลังใจ">❤️</button>
+        function startListenerRole() {
+            currentRole = 'listener';
+            document.getElementById('chatPartnerName').innerText = 'คุณลูกค้ารายแรก (คนพูด)';
+            document.getElementById('chatPartnerAvatar').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop';
+            goToScreen('screen-chat');
+        }
 
-        <input id="chat-input" type="text" placeholder="พิมพ์ความรู้สึกของคุณที่นี่..." class="flex-1 bg-warmdark border border-wood-700/60 rounded-xl px-4 py-2.5 text-sm text-wood-100 focus:outline-none focus:border-amber-500">
-        
-        <button onclick="sendChatMessage()" class="bg-amber-600 hover:bg-amber-500 text-wood-950 px-4 py-2.5 rounded-xl font-bold text-sm transition flex items-center gap-1 shadow">
-          <span>ส่ง</span>
-          <i class="fa-solid fa-paper-plane text-xs"></i>
-        </button>
-      </div>
-    </section>
+        function handleSendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
 
-    <!-- SCREEN 5: VINTAGE ROTARY PHONE CALL (Storyboard Panel: โทร) -->
-    <section id="screen-phone" class="screen screen-hidden w-full h-full max-h-[750px] bg-gradient-to-b from-wood-900 via-warmdark to-black rounded-2xl border border-wood-800/60 shadow-2xl overflow-hidden flex flex-col justify-between items-center p-6 relative">
-      <div class="text-center mt-2">
-        <span class="text-amber-400 font-jp text-xs tracking-widest">ダイヤル電話で話す</span>
-        <h2 class="text-2xl font-bold text-wood-100">สายด่วนพักใจ (Rotary Phone)</h2>
-        <p id="phone-status" class="text-xs text-amber-300 mt-1">หมุนตัวเลขเพื่อเริ่มต่อสายไปยังผู้ฟัง...</p>
-      </div>
-
-      <!-- Rotary Phone Graphic & Interaction -->
-      <div class="my-auto flex flex-col items-center relative">
-        <!-- Telephone Receiver Top -->
-        <div id="phone-receiver" class="w-64 h-16 bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900 rounded-t-full border-2 border-stone-700 shadow-xl flex justify-between items-center px-4 cursor-pointer transition duration-500 hover:scale-105">
-          <div class="w-10 h-10 bg-stone-900 rounded-full border border-amber-600/40 flex items-center justify-center">
-            <i class="fa-solid fa-microphone text-amber-500/70 text-xs"></i>
-          </div>
-          <span class="text-[10px] text-stone-400 font-mono">OMAKASE PHONE</span>
-          <div class="w-10 h-10 bg-stone-900 rounded-full border border-amber-600/40 flex items-center justify-center">
-            <i class="fa-solid fa-volume-high text-amber-500/70 text-xs"></i>
-          </div>
-        </div>
-
-        <!-- Coiled Cord Visual -->
-        <div class="w-2 h-8 bg-amber-900/60 border-x border-amber-600/30"></div>
-
-        <!-- Rotary Dial Base -->
-        <div class="w-72 h-72 rounded-full bg-gradient-to-b from-stone-800 to-stone-950 border-4 border-wood-700 p-4 shadow-2xl flex items-center justify-center relative">
-          <!-- Outer Numbers Wheel -->
-          <div id="rotary-wheel" class="w-56 h-56 rounded-full bg-stone-900 border-2 border-amber-600/40 flex items-center justify-center relative shadow-inner">
+            const chatHistory = document.getElementById('chatHistory');
             
-            <!-- Dial Hole Buttons (0-9) -->
-            <div class="absolute inset-0 grid grid-cols-3 gap-2 p-6">
-              <button onclick="dialNumber(1)" class="w-10 h-10 rounded-full bg-amber-100/10 hover:bg-amber-400/30 text-amber-200 font-bold border border-amber-500/40 flex items-center justify-center text-sm shadow">1</button>
-              <button onclick="dialNumber(2)" class="w-10 h-10 rounded-full bg-amber-100/10 hover:bg-amber-400/30 text-amber-200 font-bold border border-amber-500/40 flex items-center justify-center text-sm shadow">2</button>
-              <button onclick="dialNumber(3)" class="w-10 h-10 rounded-full bg-amber-100/10 hover:bg-amber-400/30 text-amber-200 font-bold border border-amber-500/40 flex items-center justify-center text-sm shadow">3</button>
-              <button onclick="dialNumber(4)" class="w-10 h-10 rounded-full bg-amber-100/10 hover:bg-amber-400/30 text-amber-200 font-bold border border-amber-500/40 flex items-center justify-center text-sm shadow">4</button>
-              <button onclick="dialNumber(5)" class="w-10 h-10 rounded-full bg-amber-100/10 hover:bg-amber-400/30 text-amber-200 font-bold border border-amber-500/40 flex items-center justify-center text-sm shadow">5</button>
-              <button onclick="dialNumber(6)" class="w-10 h-10 rounded-full bg-amber-100/10 hover:bg-amber-400/30 text-amber-200 font-bold border border-amber-500/40 flex items-center justify-center text-sm shadow">6</button>
-              <button onclick="dialNumber(7)" class="w-10 h-10 rounded-full bg-amber-100/10 hover:bg-amber-400/30 text-amber-200 font-bold border border-amber-500/40 flex items-center justify-center text-sm shadow">7</button>
-              <button onclick="dialNumber(8)" class="w-10 h-10 rounded-full bg-amber-100/10 hover:bg-amber-400/30 text-amber-200 font-bold border border-amber-500/40 flex items-center justify-center text-sm shadow">8</button>
-              <button onclick="dialNumber(9)" class="w-10 h-10 rounded-full bg-amber-100/10 hover:bg-amber-400/30 text-amber-200 font-bold border border-amber-500/40 flex items-center justify-center text-sm shadow">9</button>
-            </div>
+            // User message bubble
+            const userBubble = document.createElement('div');
+            userBubble.className = "flex justify-end mb-2";
+            userBubble.innerHTML = `
+                <div class="bg-amber-600 text-amber-50 px-4 py-2.5 rounded-2xl rounded-tr-none text-sm max-w-xs shadow-md">
+                    ${text}
+                </div>
+            `;
+            chatHistory.appendChild(userBubble);
+            input.value = '';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
 
-            <!-- Center Rotary Hub -->
-            <div class="w-16 h-16 rounded-full bg-wood-800 border-2 border-amber-500 flex flex-col items-center justify-center z-10 shadow-lg">
-              <span class="text-[10px] text-amber-300 font-jp">心</span>
-              <span id="dialed-display" class="text-xs font-mono text-white font-bold">---</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Call Buttons -->
-      <div class="flex gap-4">
-        <button onclick="startCallSimulation()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg flex items-center gap-2 text-sm">
-          <i class="fa-solid fa-phone"></i>
-          <span>ยกหูพูดคุย</span>
-        </button>
-        <button onclick="goToScreen('screen-speaker-options')" class="px-4 py-2.5 bg-wood-800 hover:bg-wood-700 text-wood-200 rounded-xl text-sm">
-          ยกเลิก
-        </button>
-      </div>
-    </section>
-
-    <!-- SCREEN 6: MEET APPOINTMENT SHEET (Storyboard Panel: เจอ) -->
-    <section id="screen-appointment" class="screen screen-hidden w-full h-full max-h-[750px] bg-gradient-to-b from-wood-900 via-warmdark to-black rounded-2xl border border-wood-800/60 shadow-2xl overflow-hidden flex flex-col justify-between items-center p-4 sm:p-6">
-      <div class="text-center mt-1">
-        <span class="text-amber-400 font-jp text-xs tracking-widest">ご予約フォーム</span>
-        <h2 class="text-2xl font-bold text-wood-100">ใบนัดหมายพบเจอนอกสถานที่</h2>
-        <p class="text-xs text-wood-300 mt-1">กรอกข้อมูลเพื่อนัดพบพูดคุยกับผู้ฟังที่ร้านโอมะกาเสะ</p>
-      </div>
-
-      <!-- Japanese Paper Card Aesthetic -->
-      <div class="w-full max-w-lg paper-texture text-wood-900 p-6 rounded-xl shadow-2xl border-4 border-wood-800 relative my-auto">
-        <!-- Stamp Mark -->
-        <div class="absolute top-4 right-4 w-14 h-14 border-2 border-red-700/80 rounded-full flex items-center justify-center transform rotate-12 opacity-80 pointer-events-none">
-          <span class="text-red-800 text-[10px] font-jp font-bold write-vertical">予約済</span>
-        </div>
-
-        <div class="text-center pb-3 border-b-2 border-wood-800/30 mb-4">
-          <h3 class="font-jp font-bold text-lg text-wood-900">おまかせ 予約票 ( Appointment Slip )</h3>
-        </div>
-
-        <form id="appointment-form" onsubmit="submitAppointment(event)" class="space-y-4 text-left">
-          <div>
-            <label class="block text-xs font-bold text-wood-900 mb-1">
-              <i class="fa-solid fa-location-dot text-red-800 mr-1"></i> 場所 (สถานที่นัดหมาย / สาขาร้าน):
-            </label>
-            <select required class="w-full bg-white/80 border border-wood-600 rounded-lg p-2 text-sm text-wood-900 focus:outline-none focus:ring-2 focus:ring-amber-700">
-              <option value="">-- เลือกสถานที่ร้าน --</option>
-              <option value="thonglor">สาขาทองหล่อ (Quiet Room)</option>
-              <option value="ari">สาขาอารีย์ (Garden Private Bar)</option>
-              <option value="kyoto">สาขาจำลองบรรยากาศเกียวโต</option>
-            </select>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-wood-900 mb-1">
-                <i class="fa-solid fa-calendar-day text-wood-800 mr-1"></i> 日付 (วันที่):
-              </label>
-              <input type="date" required class="w-full bg-white/80 border border-wood-600 rounded-lg p-2 text-sm text-wood-900 focus:outline-none focus:ring-2 focus:ring-amber-700">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-wood-900 mb-1">
-                <i class="fa-solid fa-clock text-wood-800 mr-1"></i> 時間 (เวลา):
-              </label>
-              <input type="time" required class="w-full bg-white/80 border border-wood-600 rounded-lg p-2 text-sm text-wood-900 focus:outline-none focus:ring-2 focus:ring-amber-700">
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-wood-900 mb-1">
-              <i class="fa-solid fa-pen text-wood-800 mr-1"></i> メモ (หัวข้อที่อยากพูดคุย / หมายเหตุ):
-            </label>
-            <textarea rows="3" placeholder="ระบุเรื่องราวหรือสิ่งที่อยากเตรียมตัวคุยเบื้องต้น..." class="w-full bg-white/80 border border-wood-600 rounded-lg p-2 text-sm text-wood-900 focus:outline-none focus:ring-2 focus:ring-amber-700"></textarea>
-          </div>
-
-          <div class="pt-2">
-            <button type="submit" class="w-full bg-gradient-to-r from-wood-800 to-wood-900 hover:from-wood-700 hover:to-wood-800 text-amber-100 font-bold py-2.5 rounded-lg shadow transition flex items-center justify-center gap-2 text-sm">
-              <i class="fa-solid fa-paper-plane"></i>
-              <span>ยืนยันส่งใบนัดหมาย</span>
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <button onclick="goToScreen('screen-speaker-options')" class="text-xs text-wood-300 hover:text-amber-200">
-        <i class="fa-solid fa-arrow-left"></i> ย้อนกลับไปตัวเลือกพูดระบาย
-      </button>
-    </section>
-
-  </main>
-
-  <!-- Notification Toast -->
-  <div id="toast-message" class="fixed bottom-6 right-6 bg-amber-500 text-wood-950 font-semibold px-5 py-3 rounded-xl shadow-2xl border border-amber-300 transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center gap-2">
-    <i class="fa-solid fa-circle-check"></i>
-    <span id="toast-text">ส่งข้อความเรียบร้อยแล้ว</span>
-  </div>
-
-  <script>
-    // Audio Ambient Generator using Web Audio API (Rain & Warm Tone Synth)
-    let audioCtx = null;
-    let isAudioPlaying = false;
-    let noiseNode = null;
-
-    function toggleAmbientAudio() {
-      const btnLabel = document.getElementById('audio-label');
-      
-      if (!isAudioPlaying) {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        
-        // Generate soothing brown noise (Rain/Ambience effect)
-        const bufferSize = audioCtx.sampleRate * 2;
-        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const output = noiseBuffer.getChannelData(0);
-        let lastOut = 0.0;
-        
-        for (let i = 0; i < bufferSize; i++) {
-          const white = Math.random() * 2 - 1;
-          output[i] = (lastOut + (0.02 * white)) / 1.02;
-          lastOut = output[i];
-          output[i] *= 3.5; 
+            // Simulated response
+            setTimeout(() => {
+                const replyBubble = document.createElement('div');
+                replyBubble.className = "flex justify-start mb-2";
+                const replyText = currentRole === 'speaker' 
+                    ? "เชฟได้รับฟังแล้วครับ... ลองทานซูชิคำนี้แล้วปล่อยความเครียดออกมาได้เลยนะ 🍣"
+                    : "ขอบคุณเชฟมากๆ นะคะที่คอยรับฟัง รู้สึกสบายใจขึ้นมากเลยค่ะ ❤️";
+                
+                replyBubble.innerHTML = `
+                    <div class="bg-stone-800/90 text-amber-200 border border-amber-500/30 px-4 py-2.5 rounded-2xl rounded-tl-none text-sm max-w-xs shadow-md backdrop-blur-sm">
+                        ${replyText}
+                    </div>
+                `;
+                chatHistory.appendChild(replyBubble);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }, 1000);
         }
 
-        noiseNode = audioCtx.createBufferSource();
-        noiseNode.buffer = noiseBuffer;
-        noiseNode.loop = true;
-
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.08; // Soft background volume
-
-        noiseNode.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        noiseNode.start();
-
-        isAudioPlaying = true;
-        btnLabel.innerText = "ปิดเสียงบรรยากาศ";
-        showToast("🔊 เปิดเสียงบรรยากาศฝนและร้านเรียบร้อย");
-      } else {
-        if (noiseNode) {
-          noiseNode.stop();
+        function spinPhone() {
+            const wheel = document.getElementById('rotaryWheel');
+            const status = document.getElementById('phoneStatus');
+            wheel.classList.add('spinning');
+            status.innerText = "กำลังหมุนสัญญาณ...";
+            
+            setTimeout(() => {
+                wheel.classList.remove('spinning');
+                status.innerText = "กำลังเชื่อมต่อสายไปยังเชฟผู้รับฟัง... 📞";
+            }, 1200);
         }
-        isAudioPlaying = false;
-        btnLabel.innerText = "เปิดเสียงบรรยากาศ";
-        showToast("🔇 ปิดเสียงบรรยากาศ");
-      }
-    }
 
-    // Navigation Switcher
-    function goToScreen(screenId) {
-      document.querySelectorAll('.screen').forEach(el => {
-        el.classList.add('screen-hidden');
-      });
-
-      const target = document.getElementById(screenId);
-      if (target) {
-        target.classList.remove('screen-hidden');
-      }
-    }
-
-    // Role Selection Logic
-    let currentRole = 'speaker'; // 'speaker' or 'listener'
-
-    function selectRole(role) {
-      currentRole = role;
-      if (role === 'speaker') {
-        goToScreen('screen-speaker-options');
-      } else {
-        // Listener mode takes the Omakase Chef view
-        document.getElementById('chat-counter-role-title').innerText = "คุณกำลังรับบทเป็น: เชฟโอมากาเสะ (ผู้ฟัง)";
-        goToScreen('screen-chat');
-        showToast("👨‍🍳 คุณเข้าสู่บทบาทเชฟ พร้อมรับฟังลูกค้าแล้ว");
-      }
-    }
-
-    // Rotary Dial Logic
-    let dialedNumbers = "";
-
-    function dialNumber(num) {
-      const wheel = document.getElementById('rotary-wheel');
-      wheel.classList.add('dial-spinning');
-      
-      dialedNumbers += num;
-      if (dialedNumbers.length > 3) dialedNumbers = dialedNumbers.slice(-3);
-      
-      document.getElementById('dialed-display').innerText = dialedNumbers;
-
-      setTimeout(() => {
-        wheel.classList.remove('dial-spinning');
-      }, 1200);
-    }
-
-    function startCallSimulation() {
-      const receiver = document.getElementById('phone-receiver');
-      const statusText = document.getElementById('phone-status');
-
-      receiver.classList.add('translate-y-[-20px]', 'rotate-6');
-      statusText.innerText = "กำลังเชื่อมต่อสายตรงไปยังผู้ฟัง... 📞";
-
-      showToast("📞 กำลังหมุนสายโทรศัพท์...");
-
-      setTimeout(() => {
-        statusText.innerText = "สายเชื่อมต่อแล้ว! สามารถพูดคุยผ่านเสียงได้เลย";
-        showToast("✨ ต่อสายสำเร็จแล้ว อยู่ในระหว่างการรับฟัง");
-      }, 2500);
-    }
-
-    // Omakase Sushi Courses Array
-    const sushiCourses = [
-      { dish: "🍣", name: "คำที่ 1: แซลมอนสดรับฟังปัญหา" },
-      { dish: "🍙", name: "คำที่ 2: โอนิกิริซับน้ำตา" },
-      { dish: "🍵", name: "คำที่ 3: ชาเขียวอุ่นใจ" },
-      { dish: "🍡", name: "คำที่ 4: ดังโงะสร้างรอยยิ้ม" }
-    ];
-    let currentCourseIndex = 0;
-
-    // Chat Logic
-    function sendChatMessage() {
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      
-      if (!text) return;
-
-      appendBubble(text, true);
-      input.value = '';
-
-      // Auto response simulate 1-on-1 response
-      setTimeout(() => {
-        let replies = [];
-        if (currentRole === 'speaker') {
-          replies = [
-            "เชฟเข้าใจความรู้สึกนี้ดีครับ ขอบคุณที่ไว้ใจระบายให้ฟังนะ",
-            "ค่อยๆ หายใจเข้าลึกๆ นะครับ เรื่องนี้หนักหนาสำหรับคุณจริงๆ",
-            "เชฟกำลังตั้งใจฟังอยู่ครับ ระบายออกมาเพิ่มได้เลยนะ"
-          ];
-        } else {
-          replies = [
-            "ลูกค้าขอบคุณมากครับที่คอยอยู่ฟัง รู้สึกดีขึ้นมากเลยครับ!",
-            "ดีใจจังที่มีเชฟใจดีแบบคุณคอยรับฟังในวันนี้"
-          ];
+        function handleMeetSubmit(e) {
+            e.preventDefault();
+            alert("บันทึกใบนัดหมายเรียบร้อยแล้ว! เชฟจะเตรียมโต๊ะโอมากาเสะรอคุณตามเวลาที่นัดหมายครับ");
+            goToScreen('screen-2');
         }
-        
-        const randomReply = replies[Math.floor(Math.random() * replies.length)];
-        appendBubble(randomReply, false);
 
-        // Progress Omakase Course
-        currentCourseIndex = (currentCourseIndex + 1) % sushiCourses.length;
-        document.getElementById('current-sushi-dish').innerText = sushiCourses[currentCourseIndex].dish;
-        document.getElementById('dish-name').innerText = sushiCourses[currentCourseIndex].name;
-
-      }, 1200);
-    }
-
-    function sendQuickEmoji(emoji) {
-      appendBubble(emoji, true);
-    }
-
-    function appendBubble(message, isMe) {
-      const chatBox = document.getElementById('chat-messages-box');
-      const wrapper = document.createElement('div');
-      
-      if (isMe) {
-        wrapper.className = "flex gap-3 items-end justify-end";
-        wrapper.innerHTML = `
-          <div class="max-w-[75%] bg-amber-600 text-wood-950 font-medium p-3 rounded-2xl rounded-br-none text-sm shadow">
-            ${escapeHTML(message)}
-          </div>
-          <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-xs text-wood-950 font-bold border border-amber-300">คุณ</div>
-        `;
-      } else {
-        wrapper.className = "flex gap-3 items-end";
-        wrapper.innerHTML = `
-          <div class="w-8 h-8 rounded-full bg-wood-800 flex items-center justify-center text-xs text-amber-300 border border-amber-500/40">シェフ</div>
-          <div class="max-w-[75%] bg-wood-800/90 text-amber-100 p-3 rounded-2xl rounded-bl-none text-sm border border-wood-700/50 shadow">
-            ${escapeHTML(message)}
-          </div>
-        `;
-      }
-
-      chatBox.appendChild(wrapper);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          "'": '&#39;',
-          '"': '&quot;'
-        }[tag] || tag)
-      );
-    }
-
-    // Submit Appointment Logic
-    function submitAppointment(e) {
-      e.preventDefault();
-      showToast("🏮 ส่งใบนัดหมายเรียบร้อยแล้ว เชฟจะเตรียมโต๊ะไว้รอครับ");
-      setTimeout(() => {
-        goToScreen('screen-1');
-      }, 2000);
-    }
-
-    // Helper Toast Notification
-    function showToast(text) {
-      const toast = document.getElementById('toast-message');
-      const toastText = document.getElementById('toast-text');
-      
-      toastText.innerText = text;
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      
-      setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
-    }
-
-    // Enter Key Listener for Chat
-    document.getElementById('chat-input').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        sendChatMessage();
-      }
-    });
-  </script>
+        function toggleAudio() {
+            const text = document.getElementById('audioText');
+            if (!isAudioPlaying) {
+                isAudioPlaying = true;
+                text.innerText = "เสียงบรรยากาศ: เปิด";
+            } else {
+                isAudioPlaying = false;
+                text.innerText = "เสียงบรรยากาศ: ปิด";
+            }
+        }
+    </script>
 </body>
 </html>
