@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 1: FRONT RESTAURANT (รูปหน้าร้านในโฟลเดอร์ images) -->
+    <!-- SCREEN 1: FRONT RESTAURANT -->
     <div id="screen-1" class="absolute inset-0 w-full h-full flex flex-col items-center justify-between p-6 bg-cover bg-center fade-in" style="background-image: url('images/FrontRes.jpg'), url('https://images.unsplash.com/photo-1578474846511-04ba529f0b88?q=80&w=1600&auto=format&fit=crop');">
         <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-black/90"></div>
 
@@ -73,7 +73,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 2: ROLE SELECTION (รูปหัวหน้าเชฟในวงกลมในโฟลเดอร์ images) -->
+    <!-- SCREEN 2: ROLE SELECTION -->
     <div id="screen-2" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 bg-stone-950 fade-in">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-950/30 via-stone-950 to-black"></div>
 
@@ -148,7 +148,7 @@
         </div>
     </div>
 
-    <!-- SCREEN: CHAT (รูปฉากในร้านในโฟลเดอร์ images + ช่องข้อความอยู่ด้านล่าง) -->
+    <!-- SCREEN: CHAT -->
     <div id="screen-chat" class="hidden absolute inset-0 w-full h-full flex flex-col justify-between bg-cover bg-center fade-in" style="background-image: url('images/inRes.jpg'), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1600&auto=format&fit=crop');">
         <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90"></div>
 
@@ -160,7 +160,7 @@
                 </div>
                 <div>
                     <h4 id="chatPartnerName" class="font-bold text-amber-200 text-sm">เชฟประจำร้าน (คนฟัง)</h4>
-                    <span class="text-[10px] text-emerald-400 flex items-center gap-1">● กำลังรับฟังอยู่ในร้าน</span>
+                    <span class="text-[10px] text-emerald-400 flex items-center gap-1">● กำลังอยู่ในร้าน</span>
                 </div>
             </div>
             <button onclick="goToScreen('screen-2')" class="text-xs bg-stone-800/80 text-stone-300 px-3 py-1.5 rounded-lg border border-stone-700 hover:bg-stone-700 transition">ออกจากร้าน</button>
@@ -168,9 +168,10 @@
 
         <!-- Chat History Container -->
         <div id="chatHistory" class="relative z-10 flex-1 overflow-y-auto p-4 space-y-3 max-w-2xl mx-auto w-full">
+            <!-- ข้อความต้อนรับเมื่อเริ่มต้น -->
             <div class="text-center my-3">
                 <span class="text-[11px] bg-black/70 text-amber-300/90 px-4 py-1.5 rounded-full border border-amber-500/30 backdrop-blur-sm">
-                    🍣 ยินดีต้อนรับสู่เคาน์เตอร์โอมะกาเสะ พิมพ์ระบายความรู้สึกของคุณได้เลย...
+                    🍣 ยินดีต้อนรับสู่เคาน์เตอร์โอมะกาเสะ พื้นที่นี้พร้อมรับฟังทุกเรื่องราวของคุณ...
                 </span>
             </div>
         </div>
@@ -178,7 +179,7 @@
         <!-- Bottom Chat Input Bar -->
         <div class="relative z-10 p-3 bg-black/85 backdrop-blur-lg border-t border-amber-500/30">
             <form onsubmit="handleSendMessage(event)" class="max-w-2xl mx-auto flex items-center gap-2">
-                <input id="chatInput" type="text" placeholder="พิมพ์ข้อความระบายความในใจที่นี่..." class="flex-1 bg-stone-900/90 text-amber-100 border border-amber-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 placeholder-stone-500">
+                <input id="chatInput" type="text" placeholder="พิมพ์ข้อความที่นี่..." class="flex-1 bg-stone-900/90 text-amber-100 border border-amber-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 placeholder-stone-500">
                 <button type="submit" class="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-amber-100 font-semibold px-5 py-3 rounded-xl text-sm transition flex items-center gap-1 shadow-lg shrink-0">
                     <span>ส่ง</span>
                     <span>🍣</span>
@@ -245,9 +246,9 @@
     <script>
         let currentRole = 'speaker';
         let isAudioPlaying = false;
-        let onlineCount = 12; // จำนวนเริ่มต้น
+        let onlineCount = 12; // จำนวนเริ่มต้นคนออนไลน์
 
-        // สุ่มตัวเลขขยับขึ้นลงของคนออนไลน์เพื่อความสมจริง
+        // ระบบสุ่มขยับตัวเลขคนออนไลน์เพื่อความสมจริง
         setInterval(() => {
             const change = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
             onlineCount = Math.max(5, onlineCount + change);
@@ -279,6 +280,7 @@
             goToScreen('screen-chat');
         }
 
+        // ระบบส่งข้อความแชท (ส่งตรงจากฝั่งผู้ใช้อย่างเดียว ไม่มี Auto-reply)
         function handleSendMessage(e) {
             e.preventDefault();
             const input = document.getElementById('chatInput');
@@ -287,7 +289,7 @@
 
             const chatHistory = document.getElementById('chatHistory');
             
-            // User message bubble
+            // สร้าง Bubble ข้อความ
             const userBubble = document.createElement('div');
             userBubble.className = "flex justify-end mb-2";
             userBubble.innerHTML = `
@@ -298,23 +300,6 @@
             chatHistory.appendChild(userBubble);
             input.value = '';
             chatHistory.scrollTop = chatHistory.scrollHeight;
-
-            // Simulated response
-            setTimeout(() => {
-                const replyBubble = document.createElement('div');
-                replyBubble.className = "flex justify-start mb-2";
-                const replyText = currentRole === 'speaker' 
-                    ? "เชฟได้รับฟังแล้วครับ... ลองทานซูชิคำนี้แล้วปล่อยความเครียดออกมาได้เลยนะ 🍣"
-                    : "ขอบคุณเชฟมากๆ นะคะที่คอยรับฟัง รู้สึกสบายใจขึ้นมากเลยค่ะ ❤️";
-                
-                replyBubble.innerHTML = `
-                    <div class="bg-stone-800/90 text-amber-200 border border-amber-500/30 px-4 py-2.5 rounded-2xl rounded-tl-none text-sm max-w-xs shadow-md backdrop-blur-sm">
-                        ${replyText}
-                    </div>
-                `;
-                chatHistory.appendChild(replyBubble);
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-            }, 1000);
         }
 
         function spinPhone() {
